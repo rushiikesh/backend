@@ -11,4 +11,4 @@ let schema = Joi.object().keys({
     reqtype: Joi.string().required()
     })
 
-module.exports = schema;;'ljkj'
+module.exports = schema;
