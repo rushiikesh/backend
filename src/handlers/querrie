@@ -1,0 +1,15 @@
+###Subscription Table
+
+CREATE TABLE tb_subscription (
+    scrb_id INT auto_increment PRIMARY KEY,
+    user_id INT,
+    msp_id INT,
+    st_date DATE not null,
+    end_date DATE not null,
+    is_active boolean,
+    scrb_type varchar(20),
+    reqtype varchar (20),
+    FOREIGN KEY (user_id) REFERENCES UserTable(user_id),
+    FOREIGN KEY (msp_id) REFERENCES MSP(msp_id)
+);
+

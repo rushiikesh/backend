@@ -1,0 +1,172 @@
+# TODO
+# - Enhance Policies for each lambda function
+# - Nested template.yml structure [https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-nested-applications.html]
+# - Solar linter for build process
+
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+Description: >-
+  test-backend
+
+Parameters:
+  DBHOST:
+    Description: "Required. The Database hostname or URL"
+    Type: "String"
+    Default: "envDBHost"
+  DBNAME:
+    Description: "Required. The Database name"
+    Type: "String"
+    Default: "envDBName"
+  DBUSER:
+    Description: "Required. Db user"
+    Type: "String"
+    Default: "envDBUser"
+  DBPASSWORD:
+    Description: "Required. Db password"
+    Type: "String"
+    Default: "envDBPassword"
+  DBPORT:
+    Description: "Required. Db port"
+    Type: "String"
+    Default: "envDBWritePort"
+
+Globals:
+  Function:
+    Environment:
+      Variables:
+        DB_HOST: !Ref DBHOST
+        DB_NAME: !Ref DBNAME
+        DB_USER: !Ref DBUSER
+        DB_PASSWORD: !Ref DBPASSWORD
+        DB_PORT: !Ref DBPORT
+        LIMIT: 10
+    Runtime: nodejs18.x
+    MemorySize: 128
+    Timeout: 60
+    Layers: 
+      - !Ref CommonLayer
+    
+Resources:
+  lambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+  # Uncomment the below AuthFunction to enable authorizer
+  # AuthFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: src/handlers/authorizer
+  #     Handler: authorizer.handler
+  #     FunctionName: envStackname-AuthFunction
+  #     Role: !GetAtt lambdaExecutionRole.Arn
+  #     Environment:
+  #       Variables:
+  #         COGNITO_CONFIG_KEY: !Ref COGNITOCONFIGKEY
+  #         JWT_PUB_KEY: !Ref JWTPUBKEY
+  #         COG_CONF: !Ref ENVCOGCONF
+  CommonLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common-layer
+      Description: Code shared across all lambda functions
+      ContentUri: src/layers/common-layer
+      CompatibleRuntimes:
+        - nodejs18.x
+      RetentionPolicy: Delete
+    Metadata:
+      BuildMethod: makefile
+      
+  createCustomer:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/createCustomer
+      Handler: index.handler
+      FunctionName: envStackname-test
+      Description: 'A lambda to test.'
+      Role: !GetAtt lambdaExecutionRole.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: '/createCustomer'
+            Method: POST
+      #Layers:
+        # - !Ref CommonCodeLayer
+    Metadata:
+      BuildMethod: nodejs18.x
+
+  manageAddress:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/manageAddress
+      Handler: index.handler
+      FunctionName: envStackname-test
+      Description: 'A lambda to test.'
+      Role: !GetAtt lambdaExecutionRole.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: '/manageAddress'
+            Method: POST
+      #Layers:
+        # - !Ref CommonCodeLayer
+    Metadata:
+      BuildMethod: nodejs18.x
+
+  createFaqs:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/createFaqs
+      Handler: index.handler
+      FunctionName: envStackname-test
+      Description: 'A lambda to test.'
+      Role: !GetAtt lambdaExecutionRole.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: '/createfaqs'
+            Method: GET
+      #Layers:
+        # - !Ref CommonCodeLayer
+    Metadata:
+      BuildMethod: nodejs18.x
+  
+
+  manageSubscription:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/handlers/manageSubscription
+      Handler: index.handler
+      FunctionName: envStackname-test
+      Description: 'A lambda to test.'
+      Role: !GetAtt lambdaExecutionRole.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: '/managesubscription'
+            Method: post
+      #Layers:
+        # - !Ref CommonCodeLayer
+    Metadata:
+      BuildMethod: nodejs18.x
+
+      
