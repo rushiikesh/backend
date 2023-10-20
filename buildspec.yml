@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: nodejs18.x
+      Node.js: v16.16.0..x
   build:
     commands:
       - sam build
