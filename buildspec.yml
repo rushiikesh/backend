@@ -4,12 +4,17 @@ phases:
   install:
     runtime-versions:
       nodejs: 16
+  
+  pre_build:
+    commands:
+      - rm -rf .git/
+
   build:
     commands:
       - sam build
-  # post_build:
-  #   commands:
-  #     - echo Build completed on `date`
+  post_build:
+    commands:
+      - sam deploy --config-env test --no-progressbar --capabilities CAPABILITY_IAM
 artifacts:
   type: zip
   files:
