@@ -11,8 +11,8 @@ phases:
 
   build:
     commands:
-      - npm install
-      - npm run build
+      # - npm install
+      # - npm run build
       - sam build
   # post_build:
   #   commands:
