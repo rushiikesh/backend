@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: nodejs18.x
+  build:
+    commands:
+      - sam build
+  # post_build:
+  #   commands:
+  #     - echo Build completed on `date`
+artifacts:
+  type: zip
+  files:
+    - template.yaml

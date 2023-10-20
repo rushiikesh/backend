@@ -17,6 +17,11 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
+s3_prefix = "backend"
+region = "ap-south-1"
+parameter_overrides = "DBHOST=\"envDBHost\" DBNAME=\"envDBName\" DBUSER=\"envDBUser\" DBPASSWORD=\"envDBPassword\" DBPORT=\"envDBWritePort\""
+image_repositories = []
+disable_rollback = true
 
 [default.package.parameters]
 resolve_s3 = true
